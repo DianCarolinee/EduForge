@@ -1,52 +1,72 @@
 # src/services/grades_service.py
-import pandas as pd
+
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
 from sqlalchemy.orm import Session
 from src.config import SessionLocal
-from src.models.grades_model import Grade
+from src.models.student_data_model import StudentData
 
-# Cargar los datos de la base de datos
-def load_grades_data(db: Session):
-    try:
-        query = db.query(Grade)
-        df = pd.read_sql(query.statement, db.bind)
-        return df
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        raise e
 
-# Obtener el resumen de las calificaciones por estudiante
-def get_grades_summary(db: Session):
-    try:
-        df = load_grades_data(db)
-        return df.groupby("Estudiante_ID")["Calificaciones"].mean().reset_index()
-    except Exception as e:
-        print(f"Error in get_grades_summary: {e}")
-        raise e
+class GradesService:
 
-# Obtener alertas de calificaciones bajas
-def get_low_grade_alerts(db: Session, threshold=11.0):
-    try:
-        df = get_grades_summary(db)
-        return df[df["Calificaciones"] < threshold]
-    except Exception as e:
-        print(f"Error in get_low_grade_alerts: {e}")
-        raise e
+    def get_grades_from_db(self, student_id: int):
+        """
+        Función para obtener las calificaciones, asistencia y conducta de la base de datos
+        """
+        db = SessionLocal()
+        try:
+            student_data = db.query(StudentData).filter(StudentData.estudiante_id == student_id).all()
+            # Aquí obtienes las calificaciones, asistencia, conducta y la fecha
+            grades = [data.calificaciones for data in student_data]
+            attendance = [data.asistencia for data in student_data]
+            behavior = [data.conducta for data in student_data]
+            months = [data.fecha.strftime("%b %Y") for data in student_data]  # Convertir la fecha a mes/año
+            return grades, attendance, behavior, months
+        finally:
+            db.close()
 
-# Obtener las tendencias de calificaciones por semestre o mes
-def get_grade_trends(db: Session):
-    try:
-        df = load_grades_data(db)
-        df['Fecha'] = pd.to_datetime(df['Fecha'])
-        df['Mes'] = df['Fecha'].dt.to_period('M')
-        return df.groupby(['Mes', 'Estudiante_ID'])["Calificaciones"].mean().reset_index()
-    except Exception as e:
-        print(f"Error in get_grade_trends: {e}")
-        raise e
+    def generate_grades_plot(self, student_id: int):
+        """
+        Función para generar el gráfico de calificaciones acumuladas, asistencia y conducta
+        """
+        # Obtener los datos desde la base de datos
+        grades, attendance, behavior, months = self.get_grades_from_db(student_id)
 
-# Obtener la sesión de la base de datos
-def get_db():
-    db = SessionLocal()  # Crear una nueva sesión de base de datos
-    try:
-        yield db  # Proporciona la sesión al usar la función como dependencia
-    finally:
-        db.close()  # Asegúrate de cerrar la sesión después de usarla
+        # Dividimos las calificaciones en Aprobados (>=11) y Desaprobados (<11)
+        approved = [grade for grade in grades if grade >= 11]
+        failed = [grade for grade in grades if grade < 11]
+
+        approved_months = [months[i] for i in range(len(grades)) if grades[i] >= 11]
+        failed_months = [months[i] for i in range(len(grades)) if grades[i] < 11]
+
+        # Crear la figura para el gráfico
+        plt.figure(figsize=(10, 6))
+
+        # Graficar las calificaciones aprobadas y desaprobadas
+        plt.plot(approved_months, approved, label="Aprobados", color="green", marker="o")
+        plt.plot(failed_months, failed, label="Desaprobados", color="red", marker="o")
+
+        # Graficar la asistencia
+        plt.plot(months, attendance, label="Asistencia (%)", color="blue", linestyle="--")
+
+        # Graficar la conducta
+        conduct_positive = [1 if cond == 'Buena' else 0 for cond in behavior]
+        conduct_negative = [1 if cond == 'Mala' else 0 for cond in behavior]
+        plt.scatter(months, conduct_positive, color="yellow", label="Buena Conducta", marker="x")
+        plt.scatter(months, conduct_negative, color="orange", label="Mala Conducta", marker="x")
+
+        # Añadir título y etiquetas
+        plt.title("Evolución de Calificaciones Acumuladas, Asistencia y Conducta")
+        plt.xlabel("Meses")
+        plt.ylabel("Valor")
+        plt.legend()
+
+        # Convertir el gráfico a un formato de imagen base64
+        img_io = BytesIO()
+        plt.savefig(img_io, format='png')
+        img_io.seek(0)
+        img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+        plt.close()
+
+        return f"data:image/png;base64,{img_base64}"

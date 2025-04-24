@@ -1,7 +1,7 @@
 # src/main.py
-import uvicorn
+
 from fastapi import FastAPI
-from src.api.routes import dashboard_grades
+from src.api.routes import dashboard_grades, prediction_calculations  # Asegúrate de importar correctamente
 
 app = FastAPI(
     title="EduForge API",
@@ -13,7 +13,8 @@ app = FastAPI(
 def read_root():
     return {"message": "Bienvenido a EduForge API"}
 
-# Incluir las rutas de calificaciones
+# Endpoint de predicción
+app.include_router(prediction_calculations.router)  # Asegúrate de incluir el router de prediction_calculations
+
+# Endpoint de calificaciones (si tienes otro router)
 app.include_router(dashboard_grades.router)
-
-
