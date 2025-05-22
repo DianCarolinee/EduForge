@@ -1,0 +1,21 @@
+id_estudiante,nombre,calificacion_promedio,porcentaje_asistencia,comportamiento,deserta
+1,Ana Perez,9.5,70,neutral,1
+2,Juan Lopez,12.0,85,positivo,0
+3,Maria Garcia,10.0,60,agresivo,1
+4,Carlos Diaz,15.5,90,positivo,0
+5,Luisa Morales,8.0,50,neutral,1
+6,Pedro Ruiz,14.0,95,positivo,0
+7,Sofia Torres,11.0,80,neutral,0
+8,Diego Rojas,7.5,55,agresivo,1
+9,Camila Soto,13.5,88,positivo,0
+10,Miguel Vargas,10.5,65,neutral,1
+11,Elena Cruz,16.0,92,positivo,0
+12,Andres Silva,9.0,58,agresivo,1
+13,Valeria Flores,14.5,85,neutral,0
+14,Lucas Herrera,8.5,60,agresivo,1
+15,Alicia Bravo,12.5,75,positivo,0
+16,Santiago Luna,10.0,62,neutral,1
+17,Isabel Gutierrez,13.0,80,positivo,0
+18,Martin Campos,9.8,59,agresivo,1
+19,Laura Peña,15.0,90,positivo,0
+20,Ricardo Salazar,7.0,52,agresivo,1
