@@ -60,13 +60,13 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="success"
-                  title="daily sales"
+                  title="Mayor riesgo de deserción"
                   description={
                     <>
-                      (<strong>+15%</strong>) increase in today sales.
+                      (<strong>Durante</strong>) el año
                     </>
                   }
-                  date="updated 4 min ago"
+                  date="Actualizado hace 1 hora"
                   chart={sales}
                 />
               </MDBox>

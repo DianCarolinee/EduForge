@@ -59,22 +59,29 @@ function UploadData() {
       const formData = new FormData();
       formData.append("file", rawFile);
 
-      const uploadRes = await fetch("http://localhost:8000/upload", {
-        method: "POST",
-        body: formData,
-      });
-
+      const uploadRes = await fetch(
+        "https://backendtesis-eduforge-production.up.railway.app/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       if (!uploadRes.ok) {
         throw new Error("Error al subir el archivo");
       }
       const uploadResult = await uploadRes.json();
       // Paso 2: Procesar el archivo para predicciones
+      const cleanFilename = uploadResult.filename.trim();
+      console.log("Filename limpio:", cleanFilename);
       const predictRes = await fetch(
-        `http://localhost:8000/predict?filename=${encodeURIComponent(uploadResult.filename)}`,
+        `https://backendtesis-eduforge-production.up.railway.app/predict?filename=${encodeURIComponent(
+          cleanFilename
+        )}`,
         {
           method: "POST",
         }
       );
+
       if (!predictRes.ok) {
         throw new Error("Error al procesar el archivo");
       }
@@ -82,7 +89,7 @@ function UploadData() {
       const predictions = await predictRes.json();
 
       // Paso 3: Navegar a la página de resultados con los datos
-      navigate("/billing", { state: { predictions: predictions.predictions } });
+      navigate("/Analisis", { state: { predictions: predictions.predictions } });
     } catch (error) {
       alert("Error al procesar el archivo");
       console.error(error);

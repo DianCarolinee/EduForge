@@ -21,14 +21,6 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Seguimiento de estudiantes",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/seguimiento",
-    component: <Tables />,
-  },
-  {
-    type: "collapse",
     name: "Análisis individual",
     key: "billing",
     icon: <Icon fontSize="small">receipt_long</Icon>,
