@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 import pickle
 import os
-import joblib  # Mejor alternativa para modelos grandes
+import joblib
 
 # 1. Configuración de paths
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
