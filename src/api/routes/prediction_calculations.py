@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from src.services.prediction_service import predict_dropout  # Asegúrate de que la importación esté aquí
+from src.services.prediction_service import predict_dropout
 
 router = APIRouter()
 
